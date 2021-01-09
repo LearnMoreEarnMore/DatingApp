@@ -1,5 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
+import { Observable } from 'rxjs';
+import { User } from 'src/_Models/user';
 import { AccountService } from 'src/_Services/account.service';
 
 @Component({
@@ -9,11 +11,11 @@ import { AccountService } from 'src/_Services/account.service';
 })
 export class NavComponent implements OnInit {
   model: any = {};
-  loggedIn: boolean
-  constructor(private accountService: AccountService, private http: HttpClient) { }
+  currentUser$: Observable<User>;
+  constructor(public accountService: AccountService, private http: HttpClient) { }
 
   ngOnInit(): void {
-    this.getCurrentUser();
+    this.currentUser$ = this.accountService.currentUser$;
   }
 
   login() {
@@ -21,18 +23,11 @@ export class NavComponent implements OnInit {
         .subscribe(arg =>
           {
             console.log(arg);
-            this.loggedIn = true;
           }, error => {console.log(error)}
         );
       }
 
   logout(){
-    this.loggedIn = false;
     this.accountService.logout();
   }
-
-  getCurrentUser(){
-    this.accountService.currentUser$.subscribe(user => this.loggedIn = !!user);
-  }
-
 }
